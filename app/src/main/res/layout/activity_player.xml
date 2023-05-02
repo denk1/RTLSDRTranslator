@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/textViewStream1"
+            android:background="@color/red"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+        <TextView
+            android:id="@+id/textViewStream2"
+            android:background="@color/red"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+        <TextView
+            android:id="@+id/textViewStream3"
+            android:background="@color/red"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+        <TextView
+            android:id="@+id/textViewStream4"
+            android:background="@color/red"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/turnOnStream1"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+
+            android:gravity="center"
+            android:text="1"/>
+        <Button
+            android:gravity="center"
+            android:id="@+id/turnOnStream2"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="2"/>
+        <Button
+            android:id="@+id/turnOnStream3"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="3"/>
+        <Button
+            android:id="@+id/turnOnStream4"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="4"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/music_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Music Title"
+        android:textSize="26sp"
+        android:textColor="#000"
+        />
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginVertical="12dp"
+        android:src="@drawable/cover"/>
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/cur_pos"
+            android:layout_alignParentStart="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="0:00"/>
+        <TextView
+            android:id="@+id/end_pos"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="0:00" />
+
+    </RelativeLayout>
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:progress="50"
+        />
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <ImageButton
+            android:id="@+id/backward"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_skip_previous_24"
+            android:background="@drawable/btn_bg"
+            />
+        <ImageButton
+            android:id="@+id/play_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_play_arrow_24"
+            android:background="@drawable/btn_bg"
+            />
+        <ImageButton
+            android:id="@+id/further"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_skip_next_24"
+            android:background="@drawable/btn_bg"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
