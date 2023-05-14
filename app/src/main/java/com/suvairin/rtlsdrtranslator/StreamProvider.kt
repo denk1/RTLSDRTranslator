@@ -11,19 +11,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StreamProvider(private val location: String, private val textViewStream: TextView, private val resources: Resources ) {
+class StreamProvider(private val location: String ) {
 
     private var handler = Handler(Looper.myLooper()!!)
     private var mediaPlayer: MediaPlayer? = null
-    private lateinit var runnable: Runnable
+
     init {
-        runnable = Runnable {
-            if(mediaPlayer!!.isPlaying)
-                textViewStream.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
-            else
-                textViewStream.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
-            handler.postDelayed(runnable, 1000)
-        }
+
     }
 
 
@@ -43,9 +37,12 @@ class StreamProvider(private val location: String, private val textViewStream: T
 
     fun startMediaStream() = CoroutineScope(Dispatchers.IO).launch {
         mediaPlayer = setMediaPlayer(location)
-        CoroutineScope(Dispatchers.Main).launch {
-            textViewStream.background = ResourcesCompat.getDrawable( resources,  R.drawable.back_green_back, null)
-            handler.postDelayed(runnable, 1000)
-        }
+        //CoroutineScope(Dispatchers.Main).launch {
+        //    textViewStream.background = ResourcesCompat.getDrawable( resources,  R.drawable.back_green_back, null)
+        //    handler.postDelayed(runnable, 1000)
+        //}
     }
+
+    val isPlaying:Boolean? get() = mediaPlayer?.isPlaying
+
 }

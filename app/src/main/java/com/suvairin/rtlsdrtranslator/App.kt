@@ -5,10 +5,12 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import com.suvairin.rtlsdrtranslator.databinding.ActivityPlayerBinding
 import com.suvairin.rtlsdrtranslator.model.PlaylistService
 
 class App: Application() {
     private lateinit var playlistService : PlaylistService
+    private  lateinit var binding: ActivityPlayerBinding
     init {
         instance = this
     }
@@ -19,6 +21,15 @@ class App: Application() {
             initPlaylistService()
 
     }
+
+    var getBindings:ActivityPlayerBinding
+        get()  = this.binding
+        set(value) {
+            this.binding = value
+        }
+
+
+
 
     public fun initPlaylistService() {
         playlistService = PlaylistService(App.applicationContext())
@@ -44,7 +55,7 @@ class App: Application() {
     companion object {
         private var instance: App? = null
 
-        public fun getInstance(): App {
+        fun getInstance(): App {
             return instance!!
         }
 
