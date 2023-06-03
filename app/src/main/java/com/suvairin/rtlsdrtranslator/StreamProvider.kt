@@ -35,7 +35,8 @@ class StreamProvider(private val location: String ) {
         }
     }
 
-    fun startMediaStream() = CoroutineScope(Dispatchers.IO).launch {
+    fun startMediaStream() = CoroutineScope(Dispatchers.Default).launch {
+
         mediaPlayer = setMediaPlayer(location)
         //CoroutineScope(Dispatchers.Main).launch {
         //    textViewStream.background = ResourcesCompat.getDrawable( resources,  R.drawable.back_green_back, null)

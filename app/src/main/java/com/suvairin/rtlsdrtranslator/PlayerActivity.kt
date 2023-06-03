@@ -1,5 +1,7 @@
 package com.suvairin.rtlsdrtranslator
 
+import android.app.Notification
+import android.app.Notification.Action
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -13,10 +15,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.SyncStateContract.Constants
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
 import com.suvairin.rtlsdrtranslator.databinding.ActivityPlayerBinding
+import com.suvairin.rtlsdrtranslator.model.Actions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,14 +42,8 @@ class PlayerActivity : AppCompatActivity() {
     private var timePos : SimpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
     private var duration: kotlin.time.Duration? = null
     private var mediaPlayer: MediaPlayer? = null
-    private var mediaStream1: MediaPlayer? = null
-    private var mediaStream2: MediaPlayer? = null
-    private var mediaStream3: MediaPlayer? = null
-    private var mediaStream4: MediaPlayer? = null
-    var mService1: PlayerService? = null
-    var mService2: PlayerService? = null
-    var mService3: PlayerService? = null
-    var mService4: PlayerService? = null
+
+    var mService: PlayerService? = null
     var mBound = false
 
 
@@ -144,7 +143,7 @@ class PlayerActivity : AppCompatActivity() {
         })
 
         runnableStream1 = Runnable {
-            if(mService1?.isPlaying == true)
+            if(mService?.isPlaying1 == true)
                 binding.textViewStream1.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
             else
                 binding.textViewStream1.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
@@ -152,7 +151,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         runnableStream2 = Runnable {
-            if(mService2?.isPlaying == true)
+            if(mService?.isPlaying2 == true)
                 binding.textViewStream2.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
             else
                 binding.textViewStream2.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
@@ -160,7 +159,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         runnableStream3 = Runnable {
-            if(mService3?.isPlaying == true)
+            if(mService?.isPlaying3 == true)
                 binding.textViewStream3.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
             else
                 binding.textViewStream3.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
@@ -168,7 +167,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         runnableStream4 = Runnable {
-            if(mService4?.isPlaying == true)
+            if(mService?.isPlaying4 == true)
                 binding.textViewStream4.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
             else
                 binding.textViewStream4.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
@@ -205,36 +204,48 @@ class PlayerActivity : AppCompatActivity() {
             //startMediaStream1()
             if(checkAudioFocus(audioFocusRequest)) {
                 val intent = Intent(this@PlayerActivity, PlayerService::class.java)
+                intent.action = Actions.START.name
                 intent.data = Uri.parse("http://79.164.82.177:15888/stream.mp3")
-                startService(intent)
-                bindService(intent, connection1, Context.BIND_AUTO_CREATE);
+                intent.putExtra("id", 1)
+                startForegroundService(intent)
+                if(!mBound)
+                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
             }
         }
 
         binding.turnOnStream2.setOnClickListener {
             if(checkAudioFocus(audioFocusRequest)) {
                 val intent = Intent(this@PlayerActivity, PlayerService::class.java)
+                intent.action = Actions.START.name
                 intent.data = Uri.parse("http://79.164.82.177:15888/soapy_stream2.mp3")
-                startService(intent)
-                bindService(intent, connection2, Context.BIND_AUTO_CREATE);
+                intent.putExtra("id", 2)
+                startForegroundService(intent)
+                if(!mBound)
+                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
             }
         }
 
         binding.turnOnStream3.setOnClickListener {
             if(checkAudioFocus(audioFocusRequest)) {
                 val intent = Intent(this@PlayerActivity, PlayerService::class.java)
+                intent.action = Actions.START.name
                 intent.data = Uri.parse("http://79.164.82.177:15888/orange_pi.mp3")
-                startService(intent)
-                bindService(intent, connection3, Context.BIND_AUTO_CREATE);
+                intent.putExtra("id", 3)
+                startForegroundService(intent)
+                if(!mBound)
+                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
             }
         }
 
         binding.turnOnStream4.setOnClickListener {
             if(checkAudioFocus(audioFocusRequest)) {
                 val intent = Intent(this@PlayerActivity, PlayerService::class.java)
+                intent.action = Actions.START.name
                 intent.data = Uri.parse("http://79.164.82.177:15888/approaches.mp3")
-                startService(intent)
-                bindService(intent, connection4, Context.BIND_AUTO_CREATE);
+                intent.putExtra("id", 4)
+                startForegroundService(intent)
+                if(!mBound)
+                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
             }
         }
 
@@ -242,68 +253,17 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
-    private val connection1: ServiceConnection = object : ServiceConnection {
+    private val connection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             className: ComponentName,
             service: IBinder
         ) {
             val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
-            mService1 = binder.getService()
-            if (mService1 != null) {
+            mService = binder.getService()
+            if (mService != null) {
                 handlerStream1.postDelayed(runnableStream1, 1000)
-            }
-            mBound = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
-
-    private val connection2: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(
-            className: ComponentName,
-            service: IBinder
-        ) {
-            val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
-            mService2 = binder.getService()
-            if (mService2 != null) {
                 handlerStream2.postDelayed(runnableStream2, 1000)
-            }
-            mBound = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
-
-    private val connection3: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(
-            className: ComponentName,
-            service: IBinder
-        ) {
-            val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
-            mService3 = binder.getService()
-            if (mService3 != null) {
                 handlerStream3.postDelayed(runnableStream3, 1000)
-            }
-            mBound = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
-
-    private val connection4: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(
-            className: ComponentName,
-            service: IBinder
-        ) {
-            val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
-            mService4 = binder.getService()
-            if (mService4 != null) {
                 handlerStream4.postDelayed(runnableStream4, 1000)
             }
             mBound = true
@@ -314,7 +274,6 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-
     private fun checkAudioFocus(audioFocusRequest: Int) : Boolean {
         return audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
@@ -323,5 +282,11 @@ class PlayerActivity : AppCompatActivity() {
         super.onDestroy()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
     }
 }
