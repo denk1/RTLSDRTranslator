@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 
 class StreamProvider(private val location: String ) {
 
-    private var handler = Handler(Looper.myLooper()!!)
     private var mediaPlayer: MediaPlayer? = null
 
     init {

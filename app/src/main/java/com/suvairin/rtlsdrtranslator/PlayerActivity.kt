@@ -286,7 +286,8 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        unbindService(connection)
+        if(mBound)
+            unbindService(connection)
         mBound = false
     }
 }

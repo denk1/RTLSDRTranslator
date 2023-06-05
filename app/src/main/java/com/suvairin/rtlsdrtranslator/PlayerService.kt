@@ -18,7 +18,10 @@ import kotlinx.coroutines.*
 
 
 class PlayerService : Service(), LifecycleOwner {
-    private lateinit var streamProvider: StreamProvider
+    private lateinit var streamProvider1: StreamProvider
+    private lateinit var streamProvider2: StreamProvider
+    private lateinit var streamProvider3: StreamProvider
+    private lateinit var streamProvider4: StreamProvider
     private lateinit var wakeLock: PowerManager.WakeLock
     private val binder = LocalBinder()
     private val TAG = "MyService"
@@ -67,7 +70,7 @@ class PlayerService : Service(), LifecycleOwner {
             val action = intent.action
             log("using an intent with action $action")
             when (action) {
-                Actions.START.name -> startService(id)
+                Actions.START.name -> startService(id, intent?.data.toString())
                 Actions.STOP.name -> stopService(id)
                 else -> log("This should never happen. No action in the received intent")
             }
@@ -84,7 +87,7 @@ class PlayerService : Service(), LifecycleOwner {
         Log.d(TAG, "Service destroyed")
     }
 
-    private fun startService(id:Int?) {
+    private fun startService(id:Int?, uri:String) {
         if (!isServiceStarted) {
             Log.d("ENDLESS-SERVICE", "Starting the foreground service task")
             //Toast.makeText(this, "Service starting its task", Toast.LENGTH_SHORT).show()
@@ -100,10 +103,10 @@ class PlayerService : Service(), LifecycleOwner {
                 }
         }
         when(id) {
-            1 -> stream1(true)
-            2 -> stream2(true)
-            3 -> stream3(true)
-            4 -> stream4(true)
+            1 -> stream1(true, uri)
+            2 -> stream2(true, uri)
+            3 -> stream3(true, uri)
+            4 -> stream4(true, uri)
             else -> log("This should never happen. No stream number in the received intent")
         }
     }
@@ -111,10 +114,10 @@ class PlayerService : Service(), LifecycleOwner {
     private fun stopService(id:Int?) {
         log("Stopping the foreground service")
         when(id) {
-            1 -> stream1(false)
-            2 -> stream2(false)
-            3 -> stream3(false)
-            4 -> stream4(false)
+            1 -> stream1(false, "")
+            2 -> stream2(false, "")
+            3 -> stream3(false, "")
+            4 -> stream4(false, "")
             else -> log("This should never happen. No stream number in the received intent")
         }
         if( isStream1Started or isStream2Started or isStream3Started or isStream4Started)
@@ -134,73 +137,81 @@ class PlayerService : Service(), LifecycleOwner {
         setServiceState(this, ServiceState.STOPPED)
     }
 
-    private fun stream1(f:Boolean) {
+    private fun stream1(f:Boolean, uri:String) {
         // we're starting a loop in a coroutine
 
         if (isStream1Started and f)
             return
         isStream1Started = f
         GlobalScope.launch(Dispatchers.IO) {
-            while (isStream1Started) {
+            //while (isStream1Started) {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
+                    streamProvider1 = StreamProvider(uri)
+                    streamProvider1.startMediaStream()
                     val str:String = "Stream 1 is working with id"
                     log(str)
                 }
-                delay(1000)
-            }
+                //delay(10000)
+            //}
             log("End of the loop 1")
         }
     }
 
-    private fun stream2(f:Boolean) {
+    private fun stream2(f:Boolean, uri:String) {
         // we're starting a loop in a coroutine
         if (isStream2Started and f)
             return
         isStream2Started = f
         GlobalScope.launch(Dispatchers.IO) {
-            while (isStream2Started) {
+            //while (isStream2Started) {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
+                    streamProvider2 = StreamProvider(uri)
+                    streamProvider2.startMediaStream()
                     val str:String = "Stream 2 is working with id"
                     log(str)
                 }
-                delay(1000)
-            }
+                //delay(10000)
+            //}
             log("End of the loop 2")
         }
     }
-    private fun stream3(f:Boolean) {
+    private fun stream3(f:Boolean, uri:String) {
         // we're starting a loop in a coroutine
         if (isStream3Started and f)
             return
         isStream3Started = f
         GlobalScope.launch(Dispatchers.IO) {
-            while (isStream3Started) {
+            //while (isStream3Started) {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
+                    streamProvider3 = StreamProvider(uri)
+                    streamProvider3.startMediaStream()
                     val str:String = "Stream 3 is working"
                     log(str)
                 }
-                delay(1000)
-            }
+                //delay(10000)
+            //}
             log("End of the loop 3")
         }
     }
-    private fun stream4(f:Boolean) {
+    private fun stream4(f:Boolean, uri:String) {
         // we're starting a loop in a coroutine
         if (isStream4Started and f)
             return
         isStream4Started = f
         GlobalScope.launch(Dispatchers.IO) {
-            while (isStream4Started) {
+            //while (isStream4Started) {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
+                    streamProvider4 = StreamProvider(uri)
+                    streamProvider4.startMediaStream()
                     val str:String = "Stream 4 is working"
                     log(str)
                 }
-                delay(1000)
-            }
+                //delay(10000)
+            //}
             log("End of the loop 4")
         }
     }
