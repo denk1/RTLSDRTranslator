@@ -1,10 +1,10 @@
 package com.suvairin.rtlsdrtranslator
 
-import android.R
-import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.os.PowerManager
@@ -12,9 +12,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
-import androidx.lifecycle.lifecycleScope
 import com.suvairin.rtlsdrtranslator.model.Actions
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class PlayerService : Service(), LifecycleOwner {
@@ -47,6 +48,22 @@ class PlayerService : Service(), LifecycleOwner {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "Service created")
+        val CHANNEL_ID = "my_channel_01"
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Channel human readable title",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
+            channel
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("")
+            .setContentText("").build()
+
+        startForeground(1, notification)
 
 
     }

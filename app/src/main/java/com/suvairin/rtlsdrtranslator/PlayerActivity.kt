@@ -17,6 +17,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.SyncStateContract.Constants
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
@@ -286,6 +287,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        //Toast.makeText(this, "onStop", Toast.LENGTH_LONG).show()
         if(mBound)
             unbindService(connection)
         mBound = false

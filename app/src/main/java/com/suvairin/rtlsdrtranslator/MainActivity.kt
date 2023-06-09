@@ -15,7 +15,8 @@ import com.suvairin.rtlsdrtranslator.adapter.BroadcastAdapter
 import com.suvairin.rtlsdrtranslator.databinding.ActivityMainBinding
 import com.suvairin.rtlsdrtranslator.downloader.DownloadCompletedReceiver
 
-class MainActivity : AppCompatActivity() {
+class
+MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var broadcastAdapter: BroadcastAdapter // Объект Adapter
     private lateinit var runnable: Runnable
@@ -40,7 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun hasReadExternalStoragePermission() =
         ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-
+    private fun hasNotificationPermission() =
+        ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     private fun requestPermissions() {
         var permissionRequest = mutableListOf<String>()
         if(!hasWriteExternalStoragePermission()) {
@@ -49,6 +51,10 @@ class MainActivity : AppCompatActivity() {
 
         if(!hasReadExternalStoragePermission()) {
             permissionRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        if(!hasNotificationPermission()) {
+            permissionRequest.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         if(permissionRequest.isNotEmpty()) {
