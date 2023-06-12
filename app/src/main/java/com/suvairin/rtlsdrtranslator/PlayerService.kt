@@ -73,17 +73,9 @@ class PlayerService : Service(), LifecycleOwner {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Service started")
         mServiceLifecycleDispatcher.onServicePreSuperOnStart()
-        //val notification: Notification = NotificationCompat.Builder(this, "")
-        //    .setContentTitle("My Foreground Service")
-        //    .setContentText("Running...")
-        //    .setSmallIcon(android.R.drawable.ic_media_play)
-        //    .build()
-        //startForeground(startId, notification)
-        //streamProvider = StreamProvider(intent?.data.toString())
+
         val id: Int? = intent?.getIntExtra("id", -1)
-        //CoroutineScope(Dispatchers.IO).launch  {
-        //    streamProvider.startMediaStream()
-        //}
+
         if (intent != null) {
             val action = intent.action
             log("using an intent with action $action")
@@ -234,6 +226,54 @@ class PlayerService : Service(), LifecycleOwner {
         }
     }
     override fun getLifecycle() = mServiceLifecycleDispatcher.lifecycle
+
+    fun stopStream(id: Int?) {
+        when(id) {
+            1 -> {
+                streamProvider1?.stopStream()
+                isStream1Started = false
+            }
+            2 -> {
+                streamProvider2?.stopStream()
+                isStream2Started = false
+            }
+            3 -> {
+                streamProvider3?.stopStream()
+                isStream3Started = false
+            }
+            4 -> {
+                streamProvider4?.stopStream()
+                isStream4Started = false
+            }
+            else -> {
+                log("This should never happen. No stream number in the received intent")
+            }
+        }
+    }
+
+    fun startStream(id: Int?) {
+        when(id) {
+            1 -> streamProvider1?.startStream()
+            2 -> streamProvider2?.startStream()
+            3 -> streamProvider3?.startStream()
+            4 -> streamProvider4?.startStream()
+            else -> {
+                log("This should never happen. No stream number in the received intent")
+            }
+        }
+    }
+
+    fun releaseStream(id: Int?) {
+        when(id) {
+            1 -> streamProvider1?.releaseStream()
+            2 -> streamProvider2?.releaseStream()
+            3 -> streamProvider3?.releaseStream()
+            4 -> streamProvider4?.releaseStream()
+            else -> {
+                log("This should never happen. No stream number in the received intent")
+            }
+        }
+    }
 
     //val isPlaying:Boolean? get() = streamProvider.isPlaying
     val isPlaying1:Boolean? get() = streamProvider1?.isPlaying

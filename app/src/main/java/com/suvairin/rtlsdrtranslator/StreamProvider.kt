@@ -35,14 +35,21 @@ class StreamProvider(private val location: String ) {
     }
 
     fun startMediaStream() = CoroutineScope(Dispatchers.Default).launch {
-
         mediaPlayer = setMediaPlayer(location)
-        //CoroutineScope(Dispatchers.Main).launch {
-        //    textViewStream.background = ResourcesCompat.getDrawable( resources,  R.drawable.back_green_back, null)
-        //    handler.postDelayed(runnable, 1000)
-        //}
     }
 
+    fun stopStream() {
+        mediaPlayer?.pause()
+    }
+
+    fun startStream() {
+        mediaPlayer?.start()
+    }
+
+    fun releaseStream() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
     val isPlaying:Boolean? get() { return mediaPlayer?.isPlaying }
 
 }

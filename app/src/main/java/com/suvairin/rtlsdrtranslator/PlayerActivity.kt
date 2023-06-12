@@ -207,55 +207,49 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.turnOnStream1.setOnClickListener {
             //startMediaStream1()
-            if(checkAudioFocus(audioFocusRequest)) {
-                val intent = Intent(this@PlayerActivity, PlayerService::class.java)
-                intent.action = Actions.START.name
-                intent.data = Uri.parse("http://79.164.82.177:15888/stream.mp3")
-                intent.putExtra("id", 1)
-                startForegroundService(intent)
-                if(!mBound)
-                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            when(mService?.isPlaying1) {
+                true -> mService?.stopStream(1)
+                false -> {
+                    mService?.releaseStream(1)
+                    startStream("http://79.164.82.177:15888/stream.mp3", 1)
+                }
+                else -> startStream("http://79.164.82.177:15888/stream.mp3", 1)
             }
         }
 
         binding.turnOnStream2.setOnClickListener {
-            if(checkAudioFocus(audioFocusRequest)) {
-                val intent = Intent(this@PlayerActivity, PlayerService::class.java)
-                intent.action = Actions.START.name
-                intent.data = Uri.parse("http://79.164.82.177:15888/soapy_stream2.mp3")
-                intent.putExtra("id", 2)
-                startForegroundService(intent)
-                if(!mBound)
-                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            when(mService?.isPlaying2) {
+                true -> mService?.stopStream(2)
+                false -> {
+                    mService?.releaseStream(2)
+                    startStream("http://79.164.82.177:15888/soapy_stream2.mp3", 2)
+                }
+                else -> startStream("http://79.164.82.177:15888/soapy_stream2.mp3", 2)
             }
         }
 
         binding.turnOnStream3.setOnClickListener {
-            if(checkAudioFocus(audioFocusRequest)) {
-                val intent = Intent(this@PlayerActivity, PlayerService::class.java)
-                intent.action = Actions.START.name
-                intent.data = Uri.parse("http://79.164.82.177:15888/orange_pi.mp3")
-                intent.putExtra("id", 3)
-                startForegroundService(intent)
-                if(!mBound)
-                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            when(mService?.isPlaying3) {
+                true -> mService?.stopStream(3)
+                false -> {
+                    mService?.releaseStream(3)
+                    startStream("http://79.164.82.177:15888/orange_pi.mp3", 3)
+                }
+                else -> startStream("http://79.164.82.177:15888/orange_pi.mp3", 3)
+
             }
         }
 
         binding.turnOnStream4.setOnClickListener {
-            if(checkAudioFocus(audioFocusRequest)) {
-                val intent = Intent(this@PlayerActivity, PlayerService::class.java)
-                intent.action = Actions.START.name
-                intent.data = Uri.parse("http://79.164.82.177:15888/approaches.mp3")
-                intent.putExtra("id", 4)
-                startForegroundService(intent)
-                if(!mBound)
-                    bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            when (mService?.isPlaying4) {
+                true -> mService?.stopStream(4)
+                false -> {
+                    mService?.releaseStream(4)
+                    startStream("http://79.164.82.177:15888/approaches.mp3", 4)
+                }
+                else -> startStream("http://79.164.82.177:15888/approaches.mp3", 4)
             }
         }
-
-
-
     }
 
     private val connection: ServiceConnection = object : ServiceConnection {
@@ -295,5 +289,17 @@ class PlayerActivity : AppCompatActivity() {
         if(mBound)
             unbindService(connection)
         mBound = false
+    }
+
+    private fun startStream(uri_str:String, id:Int) {
+        if (checkAudioFocus(audioFocusRequest)) {
+            val intent = Intent(this@PlayerActivity, PlayerService::class.java)
+            intent.action = Actions.START.name
+            intent.data = Uri.parse(uri_str)
+            intent.putExtra("id", id)
+            startForegroundService(intent)
+            if (!mBound)
+                bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        }
     }
 }
