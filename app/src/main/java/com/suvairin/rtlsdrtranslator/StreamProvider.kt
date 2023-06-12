@@ -43,6 +43,6 @@ class StreamProvider(private val location: String ) {
         //}
     }
 
-    val isPlaying:Boolean? get() = mediaPlayer?.isPlaying
+    val isPlaying:Boolean? get() { return mediaPlayer?.isPlaying }
 
 }

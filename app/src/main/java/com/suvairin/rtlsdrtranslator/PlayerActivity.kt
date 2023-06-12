@@ -144,34 +144,38 @@ class PlayerActivity : AppCompatActivity() {
         })
 
         runnableStream1 = Runnable {
-            if(mService?.isPlaying1 == true)
-                binding.textViewStream1.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
-            else
-                binding.textViewStream1.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
+            when(mService?.isPlaying1) {
+                true -> binding.textViewStream1.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
+                false -> binding.textViewStream1.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+                else -> binding.textViewStream1.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+            }
             handlerStream1.postDelayed(runnableStream1, 1000)
         }
 
         runnableStream2 = Runnable {
-            if(mService?.isPlaying2 == true)
-                binding.textViewStream2.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
-            else
-                binding.textViewStream2.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
+            when(mService?.isPlaying2) {
+                true -> binding.textViewStream2.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
+                false -> binding.textViewStream2.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+                else -> binding.textViewStream2.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+            }
             handlerStream2.postDelayed(runnableStream2, 1000)
         }
 
         runnableStream3 = Runnable {
-            if(mService?.isPlaying3 == true)
-                binding.textViewStream3.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
-            else
-                binding.textViewStream3.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
+            when(mService?.isPlaying3) {
+                true -> binding.textViewStream3.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
+                false -> binding.textViewStream3.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+                else -> binding.textViewStream3.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+            }
             handlerStream3.postDelayed(runnableStream3, 1000)
         }
 
         runnableStream4 = Runnable {
-            if(mService?.isPlaying4 == true)
-                binding.textViewStream4.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_green_back, null)
-            else
-                binding.textViewStream4.background = ResourcesCompat.getDrawable( this.resources,  R.drawable.back_red_drawable, null)
+            when(mService?.isPlaying4) {
+                true -> binding.textViewStream4.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
+                false -> binding.textViewStream4.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+                else -> binding.textViewStream4.background = ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+            }
             handlerStream4.postDelayed(runnableStream4, 1000)
         }
 

@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
@@ -19,10 +20,10 @@ import kotlinx.coroutines.launch
 
 
 class PlayerService : Service(), LifecycleOwner {
-    private lateinit var streamProvider1: StreamProvider
-    private lateinit var streamProvider2: StreamProvider
-    private lateinit var streamProvider3: StreamProvider
-    private lateinit var streamProvider4: StreamProvider
+    private var streamProvider1: StreamProvider? = null
+    private var streamProvider2: StreamProvider? = null
+    private var streamProvider3: StreamProvider? = null
+    private var streamProvider4: StreamProvider? = null
     private lateinit var wakeLock: PowerManager.WakeLock
     private val binder = LocalBinder()
     private val TAG = "MyService"
@@ -47,25 +48,25 @@ class PlayerService : Service(), LifecycleOwner {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "Service created")
-        val CHANNEL_ID = "my_channel_01"
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "Channel human readable title",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
+        log( "Service created")
+        if (Build.VERSION.SDK_INT >= 26) {
+            val CHANNEL_ID = "my_channel_01"
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
 
-        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-            channel
-        )
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
+                channel
+            )
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("")
-            .setContentText("").build()
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("")
+                .setContentText("").build()
 
-        startForeground(1, notification)
-
-
+            startForeground(1, notification)
+        }
     }
 
 
@@ -165,7 +166,7 @@ class PlayerService : Service(), LifecycleOwner {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
                     streamProvider1 = StreamProvider(uri)
-                    streamProvider1.startMediaStream()
+                    streamProvider1?.startMediaStream()
                     val str:String = "Stream 1 is working with id"
                     log(str)
                 }
@@ -185,7 +186,7 @@ class PlayerService : Service(), LifecycleOwner {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
                     streamProvider2 = StreamProvider(uri)
-                    streamProvider2.startMediaStream()
+                    streamProvider2?.startMediaStream()
                     val str:String = "Stream 2 is working with id"
                     log(str)
                 }
@@ -204,7 +205,7 @@ class PlayerService : Service(), LifecycleOwner {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
                     streamProvider3 = StreamProvider(uri)
-                    streamProvider3.startMediaStream()
+                    streamProvider3?.startMediaStream()
                     val str:String = "Stream 3 is working"
                     log(str)
                 }
@@ -223,7 +224,7 @@ class PlayerService : Service(), LifecycleOwner {
                 launch(Dispatchers.IO) {
                     //pingFakeServer()
                     streamProvider4 = StreamProvider(uri)
-                    streamProvider4.startMediaStream()
+                    streamProvider4?.startMediaStream()
                     val str:String = "Stream 4 is working"
                     log(str)
                 }
@@ -235,8 +236,8 @@ class PlayerService : Service(), LifecycleOwner {
     override fun getLifecycle() = mServiceLifecycleDispatcher.lifecycle
 
     //val isPlaying:Boolean? get() = streamProvider.isPlaying
-    val isPlaying1:Boolean? get() = isStream1Started
-    val isPlaying2:Boolean? get() = isStream2Started
-    val isPlaying3:Boolean? get() = isStream3Started
-    val isPlaying4:Boolean? get() = isStream4Started
+    val isPlaying1:Boolean? get() = streamProvider1?.isPlaying
+    val isPlaying2:Boolean? get() = streamProvider2?.isPlaying
+    val isPlaying3:Boolean? get() = streamProvider3?.isPlaying
+    val isPlaying4:Boolean? get() = streamProvider4?.isPlaying
 }
