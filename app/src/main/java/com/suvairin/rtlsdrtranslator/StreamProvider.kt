@@ -11,9 +11,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StreamProvider(private val location: String ) {
+class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListener  {
 
     private var mediaPlayer: MediaPlayer? = null
+    private var prepared:Boolean? = false
 
     init {
 
@@ -21,6 +22,7 @@ class StreamProvider(private val location: String ) {
 
 
     private fun setMediaPlayer(  location:String ): MediaPlayer {
+        isPrepared = false
         return MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -29,27 +31,41 @@ class StreamProvider(private val location: String ) {
                     .build()
             )
             setDataSource(location)
-            prepare() // might take long! (for buffering, etc)
-            start()
+            setOnPreparedListener(this@StreamProvider)
+            prepareAsync() // might take long! (for buffering, etc)
         }
-    }
-
-    fun startMediaStream() = CoroutineScope(Dispatchers.Default).launch {
-        mediaPlayer = setMediaPlayer(location)
     }
 
     fun stopStream() {
         mediaPlayer?.pause()
     }
 
-    fun startStream() {
+    private fun startStream() {
         mediaPlayer?.start()
     }
 
     fun releaseStream() {
         mediaPlayer?.release()
         mediaPlayer = null
+
     }
-    val isPlaying:Boolean? get() { return mediaPlayer?.isPlaying }
+
+    override fun onPrepared(mediaPlayer: MediaPlayer) {
+        startStream()
+        isPrepared = true
+    }
+    val isPlaying:Boolean? get() {
+        return mediaPlayer?.isPlaying
+    }
+
+    var isPrepared:Boolean? get() {
+        return prepared
+    } set(value) {
+        prepared = value
+    }
+
+    fun play() {
+        mediaPlayer = setMediaPlayer(location)
+    }
 
 }

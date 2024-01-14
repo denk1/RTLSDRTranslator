@@ -1,10 +1,13 @@
 package com.suvairin.rtlsdrtranslator
 
 import android.Manifest
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
 import com.suvairin.rtlsdrtranslator.databinding.ActivityPlayerBinding
 import com.suvairin.rtlsdrtranslator.model.PlaylistService
 
@@ -17,8 +20,8 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if(checkPermitions())
-            initPlaylistService()
+
+//            initPlaylistService()
 
     }
 
@@ -35,15 +38,19 @@ class App: Application() {
         playlistService = PlaylistService(App.applicationContext())
     }
 
-    public fun checkPermitions():Boolean {
-        return hasReadExternalStoragePermission() && hasWriteExternalStoragePermission()
-    }
+
+
 
     private fun hasWriteExternalStoragePermission() =
         ActivityCompat.checkSelfPermission(applicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
     private fun hasReadExternalStoragePermission() =
         ActivityCompat.checkSelfPermission(applicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+    private fun hasReadMediaAudioPermission() =
+        ActivityCompat.checkSelfPermission(applicationContext(), Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+
 
     public fun readData() {
         playlistService.getData()
