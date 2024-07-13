@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
@@ -129,7 +130,7 @@ class PlayerService : Service(), LifecycleOwner {
 
         }
         providersMap?.get(uri)?.first?.play()
-        val str = "Stream 1 is working with id [$uri]"
+        val str = "the stream is working with id [$uri]"
         log(str)
 
     }
@@ -158,4 +159,17 @@ class PlayerService : Service(), LifecycleOwner {
     }
 
     override fun getLifecycle() = mServiceLifecycleDispatcher.lifecycle
+
+    fun setStatusFuncFail(uri: String, setStatus : () -> Unit) {
+        providersMap?.get(uri)?.first?.setStatusFuncFail(setStatus)
+
+    }
+
+    fun setStatusFuncOk(uri: String, setStatus : () -> Unit) {
+        providersMap?.get(uri)?.first?.setStatusFuncOk(setStatus)
+    }
+
+    fun setRestoreConnFunc( uri: String, resoreConnFunc:  (String) -> Unit) {
+        providersMap?.get(uri)?.first?.setRestoreConnFunc(resoreConnFunc)
+    }
 }

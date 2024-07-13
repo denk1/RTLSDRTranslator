@@ -5,16 +5,21 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListener  {
+class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListener,  MediaPlayer.OnErrorListener  {
 
     private var mediaPlayer: MediaPlayer? = null
     private var prepared:Boolean? = false
+    private var statusFuncFail : (() -> Unit)? = null
+    private var statusFuncOk : (() -> Unit)? = null
+    private var resoreConnFunc:  ((String) -> Unit)? = null
+    private var strUrl : String = ""
 
     init {
 
@@ -30,8 +35,10 @@ class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListe
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
+            strUrl = location
             setDataSource(location)
             setOnPreparedListener(this@StreamProvider)
+            setOnErrorListener(this@StreamProvider)
             prepareAsync() // might take long! (for buffering, etc)
         }
     }
@@ -53,6 +60,17 @@ class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListe
     override fun onPrepared(mediaPlayer: MediaPlayer) {
         startStream()
         isPrepared = true
+        statusFuncOk?.invoke()
+    }
+
+    override fun onError(mp: MediaPlayer, what: Int, extra: Int): Boolean {
+        // ... react appropriately ...
+        // The MediaPlayer has moved to the Error state, must be reset!
+        log("an error has happened to the stream of $strUrl")
+        statusFuncFail?.invoke()
+        resoreConnFunc?.invoke(strUrl)
+
+        return true
     }
     val isPlaying:Boolean? get() {
         return mediaPlayer?.isPlaying
@@ -68,4 +86,15 @@ class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListe
         mediaPlayer = setMediaPlayer(location)
     }
 
+    fun setStatusFuncFail(setStatus : () -> Unit) {
+        statusFuncFail = setStatus
+    }
+
+    fun setStatusFuncOk(setStatus : () -> Unit) {
+        statusFuncOk = setStatus
+    }
+
+    fun setRestoreConnFunc(resoreConn:  (String) -> Unit) {
+        resoreConnFunc = resoreConn
+    }
 }

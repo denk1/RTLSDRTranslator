@@ -167,56 +167,56 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-        runnableStream1 = Runnable {
-            setMode(streamMap.keys.elementAt(0))
-            when (mService?.isPlaying(str_stream1)) {
-                true -> {
-                    setStatus(binding.textViewStream1, R.drawable.back_green_back)
-                }
-                false -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
-                else -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
-            }
-            Log.i("streams", "stream 1 is running")
-            handlerStream1.postDelayed(runnableStream1, 1000)
-        }
-
-        runnableStream2 = Runnable {
-            setMode(streamMap.keys.elementAt(1))
-            when (mService?.isPlaying(str_stream2)) {
-                true -> setStatus(binding.textViewStream2, R.drawable.back_green_back)
-                false -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
-                else -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
-            }
-            Log.i("streams", "stream 2 is running")
-            handlerStream2.postDelayed(runnableStream2, 1000)
-        }
-
-        runnableStream3 = Runnable {
-            setMode(streamMap.keys.elementAt(2))
-            when (mService?.isPlaying(str_stream3)) {
-                true -> setStatus(binding.textViewStream3, R.drawable.back_green_back)
-                false -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
-                else -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
-            }
-            Log.i("streams", "stream 3 is running")
-            handlerStream3.postDelayed(runnableStream3, 1000)
-        }
-
-        runnableStream4 = Runnable {
-            setMode(streamMap.keys.elementAt(3))
-            when (mService?.isPlaying(str_stream4)) {
-                true -> binding.textViewStream4.background =
-                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
-
-                false -> binding.textViewStream4.background =
-                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
-
-                else -> binding.textViewStream4.background =
-                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
-            }
-            Log.i("streams", "stream 4 is running")
-            handlerStream4.postDelayed(runnableStream4, 1000)
-        }
+//        runnableStream1 = Runnable {
+//            setMode(streamMap.keys.elementAt(0))
+//            when (mService?.isPlaying(str_stream1)) {
+//                true -> {
+//                    setStatus(binding.textViewStream1, R.drawable.back_green_back)
+//                }
+//                false -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
+//                else -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
+//            }
+//            Log.i("streams", "stream 1 is running")
+//            handlerStream1.postDelayed(runnableStream1, 1000)
+//        }
+//
+//        runnableStream2 = Runnable {
+//            setMode(streamMap.keys.elementAt(1))
+//            when (mService?.isPlaying(str_stream2)) {
+//                true -> setStatus(binding.textViewStream2, R.drawable.back_green_back)
+//                false -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
+//                else -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
+//            }
+//            Log.i("streams", "stream 2 is running")
+//            handlerStream2.postDelayed(runnableStream2, 1000)
+//        }
+//
+//        runnableStream3 = Runnable {
+//            setMode(streamMap.keys.elementAt(2))
+//            when (mService?.isPlaying(str_stream3)) {
+//                true -> setStatus(binding.textViewStream3, R.drawable.back_green_back)
+//                false -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
+//                else -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
+//            }
+//            Log.i("streams", "stream 3 is running")
+//            handlerStream3.postDelayed(runnableStream3, 1000)
+//        }
+//
+//        runnableStream4 = Runnable {
+//            setMode(streamMap.keys.elementAt(3))
+//            when (mService?.isPlaying(str_stream4)) {
+//                true -> binding.textViewStream4.background =
+//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
+//
+//                false -> binding.textViewStream4.background =
+//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+//
+//                else -> binding.textViewStream4.background =
+//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
+//            }
+//            Log.i("streams", "stream 4 is running")
+//            handlerStream4.postDelayed(runnableStream4, 1000)
+//        }
 
         runnable = Runnable {
             binding.seekbar.progress = if (mediaPlayer != null) mediaPlayer!!.currentPosition else 0
@@ -243,6 +243,7 @@ class PlayerActivity : AppCompatActivity() {
             streamMap[str_stream1] = !streamMap[str_stream1]!!
             if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
                 startStream()
+            setMode(streamMap.keys.elementAt(0), binding.textViewStream1)
 
         }
 
@@ -250,6 +251,7 @@ class PlayerActivity : AppCompatActivity() {
             streamMap[str_stream2] = !streamMap[str_stream2]!!
             if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
                 startStream()
+            setMode(streamMap.keys.elementAt(1), binding.textViewStream2)
 
         }
 
@@ -257,6 +259,7 @@ class PlayerActivity : AppCompatActivity() {
             streamMap[str_stream3] = !streamMap[str_stream3]!!
             if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
                 startStream()
+            setMode(streamMap.keys.elementAt(2), binding.textViewStream3)
 
         }
 
@@ -264,8 +267,9 @@ class PlayerActivity : AppCompatActivity() {
             streamMap[str_stream4] = !streamMap[str_stream4]!!
             if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
                 startStream()
-
+            setMode(streamMap.keys.elementAt(3), binding.textViewStream4)
         }
+
     }
 
     private val connection: ServiceConnection = object : ServiceConnection {
@@ -276,10 +280,40 @@ class PlayerActivity : AppCompatActivity() {
             val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
             mService = binder.getService()
 
-            handlerStream1.postDelayed(runnableStream1, 1000)
-            handlerStream2.postDelayed(runnableStream2, 1000)
-            handlerStream3.postDelayed(runnableStream3, 1000)
-            handlerStream4.postDelayed(runnableStream4, 1000)
+            // /////////////////////////////////////////////////////////
+            // initialization os indicators
+            // /////////////////////////////////////////////////////////
+
+
+
+
+
+            if(streamMap[streamMap.keys.elementAt(0)] == true) {
+                mService?.startStream(streamMap.keys.elementAt(0))
+                setStatusFunc(streamMap.keys.elementAt(0), binding.textViewStream1)
+                setRestoreConnFunc(streamMap.keys.elementAt(0))
+            }
+
+            if(streamMap[streamMap.keys.elementAt(1)] == true) {
+                mService?.startStream(streamMap.keys.elementAt(1))
+                setStatusFunc(streamMap.keys.elementAt(1), binding.textViewStream2)
+                setRestoreConnFunc(streamMap.keys.elementAt(1))
+            }
+            if(streamMap[streamMap.keys.elementAt(2)] == true) {
+                mService?.startStream(streamMap.keys.elementAt(2))
+                setStatusFunc(streamMap.keys.elementAt(2), binding.textViewStream3)
+                setRestoreConnFunc(streamMap.keys.elementAt(2))
+            }
+            if(streamMap[streamMap.keys.elementAt(3)] == true) {
+                mService?.startStream(streamMap.keys.elementAt(3))
+                setStatusFunc(streamMap.keys.elementAt(3), binding.textViewStream4)
+                setRestoreConnFunc(streamMap.keys.elementAt(3))
+            }
+
+            //handlerStream1.postDelayed(runnableStream1, 1000)
+            //handlerStream2.postDelayed(runnableStream2, 1000)
+            //handlerStream3.postDelayed(runnableStream3, 1000)
+            //handlerStream4.postDelayed(runnableStream4, 1000)
             mBound = true
         }
 
@@ -316,37 +350,62 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setStatus(textView: TextView?, colour: Int) {
+    private fun setStatus(url: String, textView: TextView?, colour: Int) {
         textView?.background = ResourcesCompat.getDrawable(this.resources, colour, null)
+        if(colour == R.drawable.back_green_back)
+            Log.i("streams", "the connection of $url has been established")
+        else
+            Log.i("streams", "the connection of $url has been lost")
     }
 
-    private fun setMode(strUrl:String) {
+    private fun setMode(strUrl:String, textView: TextView) {
         if (streamMap[strUrl] == true) {
-            when (mService?.isPlaying(strUrl)) {
-                true -> {
-                    var test = 0;
-                }
-                false -> {
-                    if (mService?.isPrepared(strUrl) == true) {
-                        mService?.releaseStream(strUrl)
-                        mService?.startStream(strUrl)
-                    }
-                }
-                else -> {
-                    mService?.startStream(strUrl)
-                }
-            }
+
+            mService?.startStream(strUrl)
+            setStatusFunc(strUrl, textView)
+            setRestoreConnFunc(strUrl)
+
         } else {
             when (mService?.isPlaying(strUrl)) {
                 true -> {
                     mService?.releaseStream(strUrl)
+                    setStatus(strUrl, textView, R.drawable.back_red_drawable)
+
                 }
                 false -> {
-
+                    var test = 0;
                 }
 
                 else -> mService?.releaseStream(strUrl)
             }
         }
+    }
+
+    private fun setStatusFunc(strUrl:String, textView: TextView?) {
+        val statusFuncFail: () -> Unit = {
+
+             setStatus(strUrl, textView, R.drawable.back_red_drawable)
+            streamMap[strUrl] == false
+        }
+
+        val statusFuncOk: () -> Unit = {
+            setStatus(strUrl, textView, R.drawable.back_green_back)
+            streamMap[strUrl] ==true
+        }
+
+        mService?.setStatusFuncFail(strUrl, statusFuncFail)
+        mService?.setStatusFuncOk(strUrl, statusFuncOk)
+
+    }
+
+    private fun setRestoreConnFunc(url: String) {
+        val resoreConnFunc:  (String) -> Unit = { strUrl: String ->
+
+            if(streamMap[strUrl] == true) {
+                mService?.startStream(strUrl)
+                Log.i("streams", "$strUrl has been restored")
+            }
+        }
+        mService?.setRestoreConnFunc(url, resoreConnFunc)
     }
 }
