@@ -167,56 +167,6 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-//        runnableStream1 = Runnable {
-//            setMode(streamMap.keys.elementAt(0))
-//            when (mService?.isPlaying(str_stream1)) {
-//                true -> {
-//                    setStatus(binding.textViewStream1, R.drawable.back_green_back)
-//                }
-//                false -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
-//                else -> setStatus(binding.textViewStream1, R.drawable.back_red_drawable)
-//            }
-//            Log.i("streams", "stream 1 is running")
-//            handlerStream1.postDelayed(runnableStream1, 1000)
-//        }
-//
-//        runnableStream2 = Runnable {
-//            setMode(streamMap.keys.elementAt(1))
-//            when (mService?.isPlaying(str_stream2)) {
-//                true -> setStatus(binding.textViewStream2, R.drawable.back_green_back)
-//                false -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
-//                else -> setStatus(binding.textViewStream2, R.drawable.back_red_drawable)
-//            }
-//            Log.i("streams", "stream 2 is running")
-//            handlerStream2.postDelayed(runnableStream2, 1000)
-//        }
-//
-//        runnableStream3 = Runnable {
-//            setMode(streamMap.keys.elementAt(2))
-//            when (mService?.isPlaying(str_stream3)) {
-//                true -> setStatus(binding.textViewStream3, R.drawable.back_green_back)
-//                false -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
-//                else -> setStatus(binding.textViewStream3, R.drawable.back_red_drawable)
-//            }
-//            Log.i("streams", "stream 3 is running")
-//            handlerStream3.postDelayed(runnableStream3, 1000)
-//        }
-//
-//        runnableStream4 = Runnable {
-//            setMode(streamMap.keys.elementAt(3))
-//            when (mService?.isPlaying(str_stream4)) {
-//                true -> binding.textViewStream4.background =
-//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_green_back, null)
-//
-//                false -> binding.textViewStream4.background =
-//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
-//
-//                else -> binding.textViewStream4.background =
-//                    ResourcesCompat.getDrawable(this.resources, R.drawable.back_red_drawable, null)
-//            }
-//            Log.i("streams", "stream 4 is running")
-//            handlerStream4.postDelayed(runnableStream4, 1000)
-//        }
 
         runnable = Runnable {
             binding.seekbar.progress = if (mediaPlayer != null) mediaPlayer!!.currentPosition else 0

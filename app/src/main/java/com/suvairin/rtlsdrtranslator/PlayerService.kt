@@ -5,6 +5,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
@@ -27,6 +31,10 @@ class PlayerService : Service(), LifecycleOwner {
     private val binder = LocalBinder()
     private val TAG = "MyService"
     private val mServiceLifecycleDispatcher = ServiceLifecycleDispatcher(this)
+    private var mediaPlayer: MediaPlayer? = null
+    private lateinit var audioManager: AudioManager
+    private lateinit var playbackAttributes: AudioAttributes
+    private var audioFocusRequest: Int = 0
 
     inner class LocalBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
@@ -171,5 +179,53 @@ class PlayerService : Service(), LifecycleOwner {
 
     fun setRestoreConnFunc( uri: String, resoreConnFunc:  (String) -> Unit) {
         providersMap?.get(uri)?.first?.setRestoreConnFunc(resoreConnFunc)
+    }
+
+    fun start() {
+        mediaPlayer?.start()
+    }
+
+    fun isPlaying():Boolean? {
+        return mediaPlayer?.isPlaying
+    }
+
+    fun stop() {
+        mediaPlayer?.stop()
+    }
+
+    fun release() {
+        mediaPlayer?.release()
+    }
+
+    fun getDuration(): Int? {
+        return mediaPlayer?.duration
+    }
+
+    fun seekTo(position:Int) {
+        mediaPlayer?.seekTo(position)
+    }
+
+    fun createMediaPlayer(location:String) {
+
+        mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setDataSource(location)
+            prepare() // might take long! (for buffering, etc)
+            if (checkAudioFocus(audioFocusRequest)) {
+                start()
+                //binding.playBtn.setImageResource(R.drawable.ic_baseline_pause_24)
+
+            }
+
+        }
+    }
+
+    private fun checkAudioFocus(audioFocusRequest: Int): Boolean {
+        return audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 }
