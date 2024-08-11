@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.icu.text.CaseMap.Title
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -43,41 +44,28 @@ class PlayerService : Service(), LifecycleOwner {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
+        log("bind method")
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
         log("Service created")
-        if (Build.VERSION.SDK_INT >= 26) {
-            val CHANNEL_ID = "my_channel_01"
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
 
-            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-                channel
-            )
-
-            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("")
-                .setContentText("").build()
-
-            startForeground(1, notification)
-        }
     }
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Service started")
         mServiceLifecycleDispatcher.onServicePreSuperOnStart()
+        startForeground(1, App.notification)
         if (intent != null) {
             val action = intent.action
+            val location = intent.extras!!.getString("location")
+            val title = intent.extras!!.getString("title")
             log("using an intent with action $action")
             when (action) {
-                Actions.START.name -> startService()
+                Actions.START.name -> startService(location, title)
                 Actions.STOP.name -> stopService()
                 else -> log("This should never happen. No action in the received intent")
             }
@@ -94,7 +82,7 @@ class PlayerService : Service(), LifecycleOwner {
         Log.d(TAG, "Service destroyed")
     }
 
-    private fun startService() {
+    private fun startService(location:String?, title:String?) {
 
         Log.d("ENDLESS-SERVICE", "Starting the foreground service task")
         //Toast.makeText(this, "Service starting its task", Toast.LENGTH_SHORT).show()
@@ -108,6 +96,7 @@ class PlayerService : Service(), LifecycleOwner {
                     acquire()
                 }
             }
+
 
     }
 

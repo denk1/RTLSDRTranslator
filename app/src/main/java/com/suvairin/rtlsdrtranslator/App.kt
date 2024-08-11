@@ -3,23 +3,29 @@ package com.suvairin.rtlsdrtranslator
 import android.Manifest
 import android.app.Activity
 import android.app.Application
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.app.NotificationCompat
 import com.suvairin.rtlsdrtranslator.databinding.ActivityPlayerBinding
 import com.suvairin.rtlsdrtranslator.model.PlaylistService
 
 class App: Application() {
     private lateinit var playlistService : PlaylistService
     private  lateinit var binding: ActivityPlayerBinding
+
     init {
         instance = this
     }
 
-    override fun onCreate() {
+    public override fun onCreate() {
         super.onCreate()
+        createNotificationChannel()
 
 //            initPlaylistService()
 
@@ -62,12 +68,34 @@ class App: Application() {
     companion object {
         private var instance: App? = null
 
+        var notification: Notification? = null
+
         fun getInstance(): App {
             return instance!!
         }
 
         fun applicationContext() : Context {
             return instance!!.applicationContext
+        }
+
+        public  val CHANNEL_ID_1:String = "channel1"
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            val channel = NotificationChannel(
+                CHANNEL_ID_1,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
+                channel
+            )
+
+            notification = NotificationCompat.Builder(this, CHANNEL_ID_1)
+                .setContentTitle("")
+                .setContentText("").build()
         }
     }
 }

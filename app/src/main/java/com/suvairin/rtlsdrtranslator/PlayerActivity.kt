@@ -46,7 +46,7 @@ object MyServiceUtils {
 }
 
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var binding: ActivityPlayerBinding
     lateinit var runnable: Runnable
     lateinit var runnableStream1: Runnable
@@ -113,10 +113,7 @@ class PlayerActivity : AppCompatActivity() {
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest)
         // the end of AudioManager initialization
         setContentView(binding.root)
-        val intent = intent
-        val title = intent.extras!!.getString("title")
-        val location = intent.extras!!.getString("location")
-        binding.musicTitle.text = title
+
         mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -191,112 +188,68 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.turnOnStream1.setOnClickListener {
             streamMap[str_stream1] = !streamMap[str_stream1]!!
-            if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
-                startStream()
+            startStream()
             setMode(streamMap.keys.elementAt(0), binding.textViewStream1)
 
         }
 
         binding.turnOnStream2.setOnClickListener {
             streamMap[str_stream2] = !streamMap[str_stream2]!!
-            if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
-                startStream()
+            startStream()
             setMode(streamMap.keys.elementAt(1), binding.textViewStream2)
 
         }
 
         binding.turnOnStream3.setOnClickListener {
             streamMap[str_stream3] = !streamMap[str_stream3]!!
-            if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
-                startStream()
+            startStream()
             setMode(streamMap.keys.elementAt(2), binding.textViewStream3)
 
         }
 
         binding.turnOnStream4.setOnClickListener {
             streamMap[str_stream4] = !streamMap[str_stream4]!!
-            if(!MyServiceUtils.isMyServiceRunning(this, PlayerService::class.java))
-                startStream()
+            startStream()
             setMode(streamMap.keys.elementAt(3), binding.textViewStream4)
         }
 
-    }
-
-    private val connection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(
-            className: ComponentName,
-            service: IBinder
-        ) {
-            val binder: PlayerService.LocalBinder = service as PlayerService.LocalBinder
-            mService = binder.getService()
-
-            // /////////////////////////////////////////////////////////
-            // initialization os indicators
-            // /////////////////////////////////////////////////////////
-
-
-
-
-
-            if(streamMap[streamMap.keys.elementAt(0)] == true) {
-                mService?.startStream(streamMap.keys.elementAt(0))
-                setStatusFunc(streamMap.keys.elementAt(0), binding.textViewStream1)
-                setRestoreConnFunc(streamMap.keys.elementAt(0))
-            }
-
-            if(streamMap[streamMap.keys.elementAt(1)] == true) {
-                mService?.startStream(streamMap.keys.elementAt(1))
-                setStatusFunc(streamMap.keys.elementAt(1), binding.textViewStream2)
-                setRestoreConnFunc(streamMap.keys.elementAt(1))
-            }
-            if(streamMap[streamMap.keys.elementAt(2)] == true) {
-                mService?.startStream(streamMap.keys.elementAt(2))
-                setStatusFunc(streamMap.keys.elementAt(2), binding.textViewStream3)
-                setRestoreConnFunc(streamMap.keys.elementAt(2))
-            }
-            if(streamMap[streamMap.keys.elementAt(3)] == true) {
-                mService?.startStream(streamMap.keys.elementAt(3))
-                setStatusFunc(streamMap.keys.elementAt(3), binding.textViewStream4)
-                setRestoreConnFunc(streamMap.keys.elementAt(3))
-            }
-
-            //handlerStream1.postDelayed(runnableStream1, 1000)
-            //handlerStream2.postDelayed(runnableStream2, 1000)
-            //handlerStream3.postDelayed(runnableStream3, 1000)
-            //handlerStream4.postDelayed(runnableStream4, 1000)
-            mBound = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
     }
 
     private fun checkAudioFocus(audioFocusRequest: Int): Boolean {
         return audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer?.release()
-        mediaPlayer = null
+    override fun onResume() {
+        super.onResume()
+        if (checkAudioFocus(audioFocusRequest)) {
+            val intent = intent
+            val title = intent.extras!!.getString("title")
+            val location = intent.extras!!.getString("location")
+            binding.musicTitle.text = title
+            val intentService = Intent(this@PlayerActivity, PlayerService::class.java)
+            intentService.action = Actions.START.name
+            intentService.putExtra("location", location)
+            intentService.putExtra("title", title)
+            startForegroundService(intentService)
+            bindService(intentService, this@PlayerActivity, Context.BIND_AUTO_CREATE)
+            if (!mBound)
+                mBound = true
+
+        }
+
     }
 
-    override fun onStop() {
-        super.onStop()
-        //Toast.makeText(this, "onStop", Toast.LENGTH_LONG).show()
-        if (mBound)
-            unbindService(connection)
-        mBound = false
+    override fun onPause() {
+        super.onPause()
+        unbindService(this)
+
     }
 
     private fun startStream() {
         if (checkAudioFocus(audioFocusRequest)) {
             val intent = Intent(this@PlayerActivity, PlayerService::class.java)
-            intent.action = Actions.START.name
-            startForegroundService(intent)
-            if (!mBound)
-                bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+
         }
     }
 
@@ -357,5 +310,37 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
         mService?.setRestoreConnFunc(url, resoreConnFunc)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        var binder :PlayerService.LocalBinder = service as PlayerService.LocalBinder
+        mService = binder.getService()
+
+        streamControl(streamMap.keys.elementAt(0), binding.textViewStream1)
+        streamControl(streamMap.keys.elementAt(1), binding.textViewStream2)
+        streamControl(streamMap.keys.elementAt(2), binding.textViewStream3)
+        streamControl(streamMap.keys.elementAt(3), binding.textViewStream4)
+
+        mBound = true
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        mService = null
+        mBound = true
+    }
+
+    private fun streamControl(str:String, testView:TextView) {
+        if(streamMap[str] == true) {
+            when (mService?.isPlaying(str)) {
+                false -> {
+                    mService?.startStream(str)
+                }
+                else -> {
+                    mService?.startStream(str)
+                    setStatusFunc(str, binding.textViewStream1)
+                    setRestoreConnFunc(str)
+                }
+            }
+        }
     }
 }
