@@ -82,11 +82,11 @@ class App: Application() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID_1,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT
+                "Running Notification",
+                NotificationManager.IMPORTANCE_HIGH
             )
 
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
@@ -94,8 +94,9 @@ class App: Application() {
             )
 
             notification = NotificationCompat.Builder(this, CHANNEL_ID_1)
-                .setContentTitle("")
-                .setContentText("").build()
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("RTLSDRTranslator")
+                .setContentText("Elapsed time: 00:50").build()
         }
     }
 }

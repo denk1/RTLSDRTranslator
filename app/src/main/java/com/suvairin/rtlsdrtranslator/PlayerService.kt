@@ -32,7 +32,7 @@ class PlayerService : Service(), LifecycleOwner {
     private val binder = LocalBinder()
     private val TAG = "MyService"
     private val mServiceLifecycleDispatcher = ServiceLifecycleDispatcher(this)
-    private var mediaPlayer: MediaPlayer? = null
+    private var mMediaPlayer: MediaPlayer? = null
     private lateinit var audioManager: AudioManager
     private lateinit var playbackAttributes: AudioAttributes
     private var audioFocusRequest: Int = 0
@@ -58,14 +58,14 @@ class PlayerService : Service(), LifecycleOwner {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Service started")
         mServiceLifecycleDispatcher.onServicePreSuperOnStart()
-        startForeground(1, App.notification)
+
         if (intent != null) {
             val action = intent.action
             val location = intent.extras!!.getString("location")
             val title = intent.extras!!.getString("title")
             log("using an intent with action $action")
             when (action) {
-                Actions.START.name -> startService(location, title)
+                Actions.START.name -> createMediaPlayer(location!!)
                 Actions.STOP.name -> stopService()
                 else -> log("This should never happen. No action in the received intent")
             }
@@ -171,32 +171,38 @@ class PlayerService : Service(), LifecycleOwner {
     }
 
     fun start() {
-        mediaPlayer?.start()
+        mMediaPlayer?.start()
     }
 
-    fun isPlaying():Boolean? {
-        return mediaPlayer?.isPlaying
+    fun pause() {
+        mMediaPlayer?.pause()
     }
 
     fun stop() {
-        mediaPlayer?.stop()
+        mMediaPlayer?.stop()
     }
 
     fun release() {
-        mediaPlayer?.release()
+        mMediaPlayer?.release()
     }
 
-    fun getDuration(): Int? {
-        return mediaPlayer?.duration
-    }
+    val duration:Int?
+        get() = mMediaPlayer?.duration
+
+    val currentPosition:Int?
+        get() = mMediaPlayer?.currentPosition
+
+    val isPlaying:Boolean?
+        get() = mMediaPlayer?.isPlaying
+
 
     fun seekTo(position:Int) {
-        mediaPlayer?.seekTo(position)
+        mMediaPlayer?.seekTo(position)
     }
 
     fun createMediaPlayer(location:String) {
-
-        mediaPlayer = MediaPlayer().apply {
+        startForeground(1, App.notification)
+        mMediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -217,4 +223,7 @@ class PlayerService : Service(), LifecycleOwner {
     private fun checkAudioFocus(audioFocusRequest: Int): Boolean {
         return audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
+
+    val mediaPlayer
+        get() = mMediaPlayer
 }

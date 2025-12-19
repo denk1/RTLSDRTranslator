@@ -26,6 +26,9 @@ import java.util.*
 
 
 import android.app.ActivityManager
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 object MyServiceUtils {
@@ -49,19 +52,10 @@ object MyServiceUtils {
 class PlayerActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var binding: ActivityPlayerBinding
     lateinit var runnable: Runnable
-    lateinit var runnableStream1: Runnable
-    lateinit var runnableStream2: Runnable
-    lateinit var runnableStream3: Runnable
-    lateinit var runnableStream4: Runnable
     private var audioFocusRequest: Int = 0
+    private var intentService:Intent? = null;
     private var handler = Handler(Looper.myLooper()!!)
-    private var handlerStream1 = Handler(Looper.myLooper()!!)
-    private var handlerStream2 = Handler(Looper.myLooper()!!)
-    private var handlerStream3 = Handler(Looper.myLooper()!!)
-    private var handlerStream4 = Handler(Looper.myLooper()!!)
     private var timePos: SimpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-    private var duration: kotlin.time.Duration? = null
-    private var mediaPlayer: MediaPlayer? = null
     private val str_stream1:String = ""
     private val str_stream2:String = ""
     private val str_stream3:String = ""
@@ -96,12 +90,12 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
                 .setAcceptsDelayedFocusGain(true)
                 .setOnAudioFocusChangeListener { focusChange ->
                     if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                        mediaPlayer?.start()
-                        mediaPlayer?.seekTo(curr_pos)
+                        mService?.start()
+                        mService?.seekTo(curr_pos)
 
                     } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                        mediaPlayer?.pause()
-                        curr_pos = mediaPlayer?.currentPosition!!
+                        mService?.pause()
+                        curr_pos = mService?.currentPosition!!
 
                     } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
 
@@ -113,35 +107,35 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest)
         // the end of AudioManager initialization
         setContentView(binding.root)
+        if (checkAudioFocus(audioFocusRequest)) {
+            val intent = intent
+            val title = intent.extras!!.getString("title")
+            val location = intent.extras!!.getString("location")
+            binding.musicTitle.text = title
+            intentService = Intent(this@PlayerActivity, PlayerService::class.java)
+            intentService?.action = Actions.START.name
+            intentService?.putExtra("location", location)
+            intentService?.putExtra("title", title)
+            startService(intentService)
 
-        mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            setDataSource(location)
-            prepare() // might take long! (for buffering, etc)
-            if (checkAudioFocus(audioFocusRequest)) {
-                start()
-                binding.playBtn.setImageResource(R.drawable.ic_baseline_pause_24)
 
-            }
         }
+    }
+
+    private fun initPlayerControls() {
         val timeZone: SimpleTimeZone = SimpleTimeZone(0, "UTC")
         timePos.timeZone = timeZone
-        binding.endPos.text = timePos.format(mediaPlayer?.duration)
+        binding.endPos.text = timePos.format(mService?.duration)
         binding.seekbar.progress = 0
-        binding.seekbar.max = mediaPlayer!!.duration
+        binding.seekbar.max = mService?.duration!!
 
         binding.playBtn.setOnClickListener {
-            if (!mediaPlayer!!.isPlaying) {
+            if (!mService?.isPlaying!!) {
                 if (checkAudioFocus(audioFocusRequest))
-                    mediaPlayer?.start()
+                    mService?.start()
                 binding.playBtn.setImageResource(R.drawable.ic_baseline_pause_24)
             } else {
-                mediaPlayer?.pause()
+                mService?.pause()
                 binding.playBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
 
             }
@@ -151,7 +145,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, pos: Int, changed: Boolean) {
                 if (changed) {
-                    mediaPlayer?.seekTo(pos)
+                    mService?.seekTo(pos)
                 }
             }
 
@@ -166,24 +160,24 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
 
 
         runnable = Runnable {
-            binding.seekbar.progress = if (mediaPlayer != null) mediaPlayer!!.currentPosition else 0
+            binding.seekbar.progress = if (mService != null) mService?.currentPosition!! else 0
             binding.curPos.text = timePos.format(binding.seekbar.progress)
             handler.postDelayed(runnable, 1000)
         }
 
         handler.postDelayed(runnable, 1000)
 
-        mediaPlayer?.setOnCompletionListener {
+        mService?.mediaPlayer?.setOnCompletionListener {
             binding.playBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
             binding.seekbar.progress = 0
         }
 
         binding.backward.setOnClickListener {
-            mediaPlayer!!.seekTo(mediaPlayer!!.currentPosition - 1000)
+            mService?.seekTo(mService?.currentPosition!! - 1000)
         }
 
         binding.further.setOnClickListener {
-            mediaPlayer!!.seekTo(mediaPlayer!!.currentPosition + 1000)
+            mService?.seekTo(mService?.currentPosition!! + 1000)
         }
 
         binding.turnOnStream1.setOnClickListener {
@@ -212,7 +206,6 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             startStream()
             setMode(streamMap.keys.elementAt(3), binding.textViewStream4)
         }
-
     }
 
     private fun checkAudioFocus(audioFocusRequest: Int): Boolean {
@@ -221,27 +214,19 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onResume() {
         super.onResume()
-        if (checkAudioFocus(audioFocusRequest)) {
-            val intent = intent
-            val title = intent.extras!!.getString("title")
-            val location = intent.extras!!.getString("location")
-            binding.musicTitle.text = title
-            val intentService = Intent(this@PlayerActivity, PlayerService::class.java)
-            intentService.action = Actions.START.name
-            intentService.putExtra("location", location)
-            intentService.putExtra("title", title)
-            startForegroundService(intentService)
-            bindService(intentService, this@PlayerActivity, Context.BIND_AUTO_CREATE)
-            if (!mBound)
-                mBound = true
+        bindService(intentService, this@PlayerActivity, Context.BIND_AUTO_CREATE)
+        if (!mBound)
+            mBound = true
+        var test = 5;
 
-        }
 
     }
 
     override fun onPause() {
         super.onPause()
         unbindService(this)
+        if (mBound)
+            mBound = false
 
     }
 
@@ -315,7 +300,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         var binder :PlayerService.LocalBinder = service as PlayerService.LocalBinder
         mService = binder.getService()
-
+        initPlayerControls();
         streamControl(streamMap.keys.elementAt(0), binding.textViewStream1)
         streamControl(streamMap.keys.elementAt(1), binding.textViewStream2)
         streamControl(streamMap.keys.elementAt(2), binding.textViewStream3)
@@ -334,6 +319,9 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             when (mService?.isPlaying(str)) {
                 false -> {
                     mService?.startStream(str)
+                }
+                true -> {
+                    val test_i = 6;
                 }
                 else -> {
                     mService?.startStream(str)

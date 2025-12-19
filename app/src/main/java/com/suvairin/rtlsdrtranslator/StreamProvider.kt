@@ -67,6 +67,7 @@ class StreamProvider(private val location: String ): MediaPlayer.OnPreparedListe
         // ... react appropriately ...
         // The MediaPlayer has moved to the Error state, must be reset!
         log("an error has happened to the stream of $strUrl")
+        mediaPlayer?.release()
         statusFuncFail?.invoke()
         resoreConnFunc?.invoke(strUrl)
 

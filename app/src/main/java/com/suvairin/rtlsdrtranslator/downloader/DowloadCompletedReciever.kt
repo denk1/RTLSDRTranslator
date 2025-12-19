@@ -18,7 +18,6 @@ class DownloadCompletedReceiver(
                 println("Download with ID $id finished")
                 App.getInstance().readData()
                 broadcastAdapter.data = App.getInstance().getBroadcast
-                val test = 2 + 2
 
             }
         }
