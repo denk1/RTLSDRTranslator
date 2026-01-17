@@ -4,6 +4,7 @@ import android.content.Context
 import android.icu.text.CaseMap.Title
 import android.net.Uri
 import android.os.Environment
+import com.suvairin.rtlsdrtranslator.AppConfig
 import com.suvairin.rtlsdrtranslator.downloader.AndroidDownloader
 import org.simpleframework.xml.*
 import org.simpleframework.xml.core.Persister
@@ -43,7 +44,7 @@ class PlaylistService(
         fileName = Environment.getExternalStorageDirectory().absolutePath +
                 "/" + Environment.DIRECTORY_DOWNLOADS + "/playlist.xspf"
 
-        downloader.downloadFile("http://rss.infowars.com/playlist.xspf")
+        downloader.downloadFile(AppConfig.PlayerListUrl.MEDIA_LIST_URL)
 
     }
 
