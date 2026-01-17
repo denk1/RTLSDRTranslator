@@ -56,12 +56,12 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
     private var intentService:Intent? = null;
     private var handler = Handler(Looper.myLooper()!!)
     private var timePos: SimpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-    private val str_stream1:String = ""
-    private val str_stream2:String = ""
-    private val str_stream3:String = ""
-    private val str_stream4:String = ""
+    private val str_stream1:String = AppConfig.StreamUrls.STREAM1
+    private val str_stream2:String = AppConfig.StreamUrls.STREAM2
+    private val str_stream3:String = AppConfig.StreamUrls.STREAM3
+    private val str_stream4:String = AppConfig.StreamUrls.STREAM4
 
-    val streamMap = mapOf(str_stream1 to false,
+    private val streamMap = mapOf(str_stream1 to false,
                           str_stream2 to false,
                           str_stream3 to false,
                           str_stream4 to false).toMutableMap()
